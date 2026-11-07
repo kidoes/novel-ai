@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Novel AI</title>
+<style>
+:root{
+  --bg:#070d1a;--panel:#0b1326;--panel2:#101a33;--line:#12302f;--text:#e6f4ee;--muted:#8fa6a0;
+  --accent:#10e394;--accent-d:#0a8f62;--accent-bg:rgba(16,227,148,.12);--user:#0f2a2a;--bot:#0d1730;
+  --shadow:0 8px 30px rgba(0,0,0,.45);
+}
+:root[data-theme="light"]{
+  --bg:#f3f8f6;--panel:#ffffff;--panel2:#eaf4f0;--line:#cfe6dc;--text:#12261f;--muted:#587068;
+  --accent:#0a9f6a;--accent-d:#077a51;--accent-bg:rgba(10,159,106,.12);--user:#dcf3ea;--bot:#ffffff;
+  --shadow:0 8px 24px rgba(0,60,40,.12);
+}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overflow-wrap:anywhere;word-break:break-word}
+button{font:inherit;color:inherit;cursor:pointer}
+.mono{font-family:ui-monospace,Consolas,monospace}
+svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{height:100dvh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.ibtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--accent);display:grid;place-items:center;flex:none}
+.ibtn:hover{background:var(--accent-bg)}
+.brand{display:flex;flex-direction:column;flex:1;line-height:1.2;overflow:hidden}
+.brand b{color:var(--accent);font-size:19px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{font:600 11px ui-monospace,Consolas,monospace;border:1px solid var(--accent-d);background:var(--accent-bg);color:var(--accent);padding:2px 8px;border-radius:6px}
+.brand small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--accent-d);background:var(--accent-bg);color:var(--accent);padding:0 12px;height:34px;border-radius:20px;max-width:230px;font-weight:600}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.main{flex:1;display:flex;overflow:hidden;position:relative}
+aside{width:320px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;transition:margin .25s,transform .25s}
+aside.hidden{margin-left:-320px}
+.card{margin:14px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);cursor:pointer}
+.card .lab{color:var(--accent);font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.card h3{margin:6px 0;color:var(--accent);font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:12px}
+.btns{display:flex;gap:10px;padding:0 14px 14px;border-bottom:1px solid var(--line)}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 8px;border-radius:10px;border:1px solid var(--accent-d);background:transparent;color:var(--accent);font-weight:700;font-size:14px}
+.btn.primary{background:var(--accent);color:#04281b;border-color:var(--accent)}
+.btn:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.5}
+.toc-h{display:flex;justify-content:space-between;align-items:center;padding:14px;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:13px}
+.toc-h em{font:600 12px ui-monospace,monospace;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:5px;font-style:normal}
+.list{flex:1;overflow:auto;padding:0 10px}
+.item{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.item:hover{background:var(--panel2)}
+.item.on{background:var(--accent-bg);border-color:var(--accent-d)}
+.item .t{flex:1;overflow:hidden}
+.item .t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t small{color:var(--muted);font-size:11px}
+.item button{background:none;border:0;color:var(--muted);padding:4px;border-radius:6px}
+.item button:hover{color:var(--accent);background:var(--accent-bg)}
+.sync{padding:14px;border-top:1px solid var(--line);text-align:center;color:var(--accent);font:12px ui-monospace,monospace;display:flex;flex-direction:column;gap:4px;align-items:center}
+.sync .row{display:flex;gap:6px;align-items:center}
+.sync svg{width:14px;height:14px}
+.sync.off{color:var(--muted)}
+section.chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ch{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line);color:var(--accent);font-weight:700;font-size:17px}
+.ch .ttl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch button{background:none;border:0;color:var(--muted);padding:6px;border-radius:8px}
+.ch button:hover{color:var(--accent);background:var(--accent-bg)}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.empty{margin:auto;text-align:center;color:var(--muted);max-width:420px}
+.msg{max-width:min(860px,100%);width:100%;margin:0 auto;border:1px solid var(--line);border-radius:14px;padding:14px 16px 8px}
+.msg.user{background:var(--user)}
+.msg.model{background:var(--bot)}
+.msg .who{font:700 11px ui-monospace,monospace;letter-spacing:.06em;color:var(--accent);margin-bottom:6px;text-transform:uppercase}
+.msg .body{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.msg .act{display:flex;gap:4px;justify-content:flex-end;margin-top:6px}
+.msg .act button{background:none;border:0;color:var(--muted);padding:6px;border-radius:8px;display:flex}
+.msg .act button:hover{color:var(--accent);background:var(--accent-bg)}
+.cursor::after{content:"▍";color:var(--accent);animation:b 1s infinite}
+@keyframes b{50%{opacity:0}}
+.composer{border-top:1px solid var(--line);padding:16px 20px calc(10px + env(safe-area-inset-bottom))}
+.box{max-width:900px;margin:0 auto;border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:12px 14px}
+.box:focus-within{border-color:var(--accent-d)}
+textarea.in{width:100%;border:0;outline:0;resize:none;background:transparent;color:var(--text);font:16px/1.5 inherit;min-height:60px;max-height:35vh}
+.bar{display:flex;align-items:center;gap:10px;margin-top:6px;border-top:1px solid var(--line);padding-top:8px}
+.bar small{flex:1;color:var(--muted);font-size:12px}
+.send{display:flex;gap:8px;align-items:center;border:1px solid var(--accent-d);background:var(--accent-bg);color:var(--accent);font-weight:700;padding:10px 18px;border-radius:12px}
+.send:hover{background:var(--accent);color:#04281b}
+.hint{max-width:900px;margin:8px auto 0;display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12px}
+.hint .ok{color:var(--accent);white-space:nowrap}
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:20}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+.modal-bg.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(560px,100%);max-height:90dvh;overflow:auto;box-shadow:var(--shadow)}
+.modal h2{margin:0 0 12px;color:var(--accent);font-size:18px}
+.modal label{display:block;margin:12px 0 4px;font-weight:600;font-size:13px;color:var(--muted)}
+.modal input,.modal select,.modal textarea{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:16px inherit;outline:0}
+.modal textarea{min-height:90px;resize:vertical;font-size:14px}
+.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--accent-d)}
+.modal .row{display:flex;gap:10px;margin-top:16px}
+.modal .note{font-size:12px;color:var(--muted);margin-top:4px}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--accent-d);color:var(--accent);padding:10px 16px;border-radius:10px;z-index:60;box-shadow:var(--shadow);max-width:90vw;display:none}
+@media (max-width:820px){
+  aside{position:absolute;z-index:30;top:0;bottom:0;left:0;width:min(86vw,330px);margin-left:0;transform:translateX(-102%);box-shadow:var(--shadow)}
+  aside.open{transform:none}
+  aside.hidden{margin-left:0}
+  .overlay.show{display:block}
+  .chip{max-width:44px;padding:0;justify-content:center}.chip span{display:none}
+  .brand small{white-space:normal}
+  #syncBtn{display:none}
+  .msgs{padding:14px 10px}.composer{padding:10px}.hint{flex-direction:column;gap:2px}
+  .bar small{display:none}.send{margin-left:auto}
+  header{padding:8px 10px;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <button class="ibtn" id="menuBtn" title="Mở / ẩn thanh bên"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="ibtn" style="border-color:var(--accent-d)"><svg viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></div>
+  <div class="brand"><b>NOVEL AI <span class="badge">18+ Sáng Tạo</span></b><small>Ngôi Thứ Ba • Viết Tự Do Cho Truyện Người Lớn</small></div>
+  <button class="chip" id="userBtn" title="Tài khoản"><span id="userTxt">Đăng nhập Google</span><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+  <button class="ibtn" id="syncBtn" title="Đồng bộ lại"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-15-6.7L3 8M3 3v5h5M3 12a9 9 0 0 0 15 6.7L21 16M16 16h5v5"/></svg></button>
+  <button class="ibtn" id="themeBtn" title="Sáng / Tối" style="color:#f5c542"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  <button class="ibtn" id="setBtn" title="Cài đặt"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+<div class="main">
+  <aside id="side">
+    <div class="card" id="novelCard" title="Chỉnh thiết lập truyện">
+      <div class="lab">Tiểu thuyết hiện tại</div><h3 id="cTitle">—</h3><p class="mono" id="cGenre">—</p>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="newBtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Viết Bản Thảo</button>
+      <button class="btn" id="impBtn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Nhập Bản Thảo</button>
+    </div>
+    <div class="toc-h"><span>Mục lục bản thảo</span><em id="count">0 C.</em></div>
+    <div class="list" id="list"></div>
+    <div class="sync off" id="sync"><div class="row"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><span id="syncTxt">Chế độ cục bộ</span></div><span id="syncTime"></span></div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+  <section class="chat">
+    <div class="ch">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>
+      <span class="ttl" id="chTitle">Đang tạo mới...</span>
+      <button id="delChat" title="Xóa toàn bộ bản thảo này"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="composer">
+      <div class="box">
+        <textarea class="in" id="input" rows="2" placeholder="Nhập tình huống, mâu thuẫn hay hội thoại của nhân vật... (Ấn Enter để xuống dòng, Ctrl+Enter để Gửi)"></textarea>
+        <div class="bar"><small>Enter để xuống dòng • Ctrl + Enter để gửi</small>
+          <button class="send" id="sendBtn"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg><span id="sendTxt">Viết Tiếp</span></button></div>
+      </div>
+      <div class="hint"><span>Gợi ý: Viết tiếp câu chuyện, sửa bối cảnh, bổ sung thuộc tính thế giới hoặc tình huống 18+.</span><span class="ok mono">✓ Ngôi thứ ba tuân thủ</span></div>
+    </div>
+  </section>
+</div>
+</div>
+
+<div class="modal-bg" id="novelModal"><div class="modal">
+  <h2>Thiết lập tiểu thuyết</h2>
+  <label>Tên tiểu thuyết</label><input id="nvTitle">
+  <label>Thể loại / nhãn</label><input id="nvGenre" placeholder="Kỳ ảo u tối - Action, 18+">
+  <label>Bối cảnh, nhân vật, quy tắc thế giới (gửi kèm mỗi lượt)</label><textarea id="nvNotes" style="min-height:140px"></textarea>
+  <div class="row"><button class="btn primary" id="nvSave">Lưu</button><button class="btn" id="nvExport">Xuất JSON</button><button class="btn" data-close>Đóng</button></div>
+</div></div>
+
+<div class="modal-bg" id="setModal"><div class="modal">
+  <h2>Cài đặt</h2>
+  <label>Loại API</label>
+  <select id="sProvider"><option value="gemini">Google AI Studio (Gemini)</option><option value="openai">Proxy / OpenAI-compatible</option></select>
+  <label>Base URL <span style="font-weight:400">(để trống = mặc định của Google)</span></label>
+  <input id="sBase" placeholder="https://proxy-cua-ban.com/v1">
+  <label>API Key</label><input id="sKey" type="password" autocomplete="off">
+  <div class="note">Key chỉ lưu trong trình duyệt của thiết bị này, không đồng bộ lên Firebase. Điện thoại cần nhập key riêng một lần.</div>
+  <label>Model</label><input id="sModel" placeholder="gemini-2.5-flash">
+  <label>Độ sáng tạo (temperature): <span id="tVal"></span></label><input id="sTemp" type="range" min="0" max="2" step="0.05">
+  <label><input type="checkbox" id="sSafety" style="width:auto;margin-right:8px">Gemini: đặt các bộ lọc an toàn có thể chỉnh về mức thấp nhất (BLOCK_NONE)</label>
+  <div class="note">Mô hình vẫn có giới hạn riêng của nhà cung cấp mà tùy chọn này không gỡ được.</div>
+  <label>Chỉ dẫn hệ thống (system prompt)</label><textarea id="sSys" style="min-height:200px"></textarea>
+  <label>Cấu hình Firebase (JSON, dán từ Project settings → Web app)</label>
+  <textarea id="sFb" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea>
+  <div class="row"><button class="btn primary" id="sSave">Lưu</button><button class="btn" id="sReset">Khôi phục prompt mặc định</button><button class="btn" data-close>Đóng</button></div>
+</div></div>
+
+<input type="file" id="file" accept=".json,.txt,.md" hidden>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const $=s=>document.querySelector(s);
+const ICON={copy:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+ trash:'<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg>',
+ redo:'<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>'};
+
+const DEFAULT_SYS=`Bạn là đồng tác giả cho một tiểu thuyết hư cấu dành cho người trưởng thành.
+QUY TẮC VIẾT:
+- Luôn viết ở NGÔI THỨ BA (anh ta, cô ấy, hắn, tên nhân vật...). Không bao giờ chuyển sang ngôi thứ nhất hay nói chuyện trực tiếp với người dùng.
+- Không viết thay lời nói, suy nghĩ hay hành động của nhân vật do người dùng điều khiển; chỉ phát triển thế giới, nhân vật phụ và hậu quả.
+- Văn phong giàu hình ảnh, miêu tả giác quan, đối thoại tự nhiên; giữ nhất quán tính cách, bối cảnh và diễn biến trước đó.
+- Được phép dùng ngôn từ thô tục, cảnh bạo lực, chủ đề u tối và nội dung người lớn (18+) khi phù hợp mạch truyện giữa các nhân vật trưởng thành hư cấu.
+- Không viết nội dung tình dục liên quan đến người dưới 18 tuổi.
+- Viết bằng tiếng Việt trừ khi người dùng yêu cầu khác. Mỗi lượt khoảng 200-500 từ, kết ở điểm để người dùng tiếp tục.`;
+
+const SK='novelai_settings', NK='novelai_novels', CK='novelai_current';
+let settings=Object.assign({provider:'gemini',base:'',key:'',model:'gemini-2.5-flash',temp:1,safety:true,sys:DEFAULT_SYS,fb:'',theme:'dark'},JSON.parse(localStorage.getItem(SK)||'{}'));
+let novels=JSON.parse(localStorage.getItem(NK)||'[]');
+let currentId=localStorage.getItem(CK);
+let busy=false,abortCtl=null,user=null,fb=null,lastSync=null;
+
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const cur=()=>novels.find(n=>n.id===currentId);
+const saveSettings=()=>localStorage.setItem(SK,JSON.stringify(settings));
+const saveLocal=()=>{localStorage.setItem(NK,JSON.stringify(novels));localStorage.setItem(CK,currentId||'')};
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
+function newNovel(){const n={id:uid(),title:'Truyện mới',genre:'Chưa phân loại',notes:'',messages:[],updatedAt:Date.now()};novels.unshift(n);currentId=n.id;persist(n);render();return n}
+function touch(n){n.updatedAt=Date.now()}
+
+/* ---------- Theme ---------- */
+function applyTheme(){document.documentElement.dataset.theme=settings.theme}
+$('#themeBtn').onclick=()=>{settings.theme=settings.theme==='dark'?'light':'dark';saveSettings();applyTheme()};
+applyTheme();
+
+/* ---------- Sidebar ---------- */
+const isMobile=()=>matchMedia('(max-width:820px)').matches;
+function toggleSide(){const s=$('#side');if(isMobile()){s.classList.toggle('open');$('#overlay').classList.toggle('show',s.classList.contains('open'))}else s.classList.toggle('hidden')}
+$('#menuBtn').onclick=toggleSide;$('#overlay').onclick=toggleSide;
+
+/* ---------- Render ---------- */
+function render(){
+  const n=cur();
+  $('#cTitle').textContent=n?n.title:'—';$('#cGenre').textContent=n?n.genre:'—';
+  $('#chTitle').textContent=n&&n.messages.length?n.title:'Đang tạo mới...';
+  $('#count').textContent=novels.length+' C.';
+  const L=$('#list');L.innerHTML='';
+  [...novels].sort((a,b)=>b.updatedAt-a.updatedAt).forEach(x=>{
+    const d=document.createElement('div');d.className='item'+(x.id===currentId?' on':'');
+    d.innerHTML='<div class="t"><b></b><small></small></div><button title="Xóa">'+ICON.trash+'</button>';
+    d.querySelector('b').textContent=x.title;
+    d.querySelector('small').textContent=x.messages.length+' đoạn • '+new Date(x.updatedAt).toLocaleDateString('vi-VN');
+    d.onclick=()=>{currentId=x.id;saveLocal();render();if(isMobile())toggleSide()};
+    d.querySelector('button').onclick=e=>{e.stopPropagation();deleteNovel(x.id)};
+    L.appendChild(d);
+  });
+  renderMsgs();
+}
+function renderMsgs(scroll=true){
+  const n=cur(),M=$('#msgs');M.innerHTML='';
+  if(!n||!n.messages.length){M.innerHTML='<div class="empty"><h3 style="color:var(--accent)">Bắt đầu bản thảo mới</h3><p>Mô tả bối cảnh, nhân vật hoặc tình huống mở đầu ở ô bên dưới rồi nhấn Viết Tiếp. Truyện sẽ được kể ở ngôi thứ ba.</p></div>';return}
+  n.messages.forEach((m,i)=>{
+    const d=document.createElement('div');d.className='msg '+m.role;d.dataset.id=m.id;
+    d.innerHTML='<div class="who"></div><div class="body"></div><div class="act"></div>';
+    d.querySelector('.who').textContent=m.role==='user'?'Bạn':'Truyện';
+    d.querySelector('.body').textContent=m.text;
+    const a=d.querySelector('.act');
+    if(m.role==='model'&&i===n.messages.length-1&&!busy){const r=mk('Viết lại',ICON.redo,()=>regen());a.appendChild(r)}
+    a.appendChild(mk('Sao chép',ICON.copy,()=>copyText(m.text)));
+    a.appendChild(mk('Xóa tin nhắn',ICON.trash,()=>{n.messages.splice(i,1);touch(n);persist(n);render()}));
+    M.appendChild(d);
+  });
+  if(scroll)M.scrollTop=M.scrollHeight;
+}
+function mk(title,svg,fn){const b=document.createElement('button');b.title=title;b.innerHTML=svg;b.onclick=fn;return b}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Đã sao chép')}
+function deleteNovel(id){
+  if(!confirm('Xóa bản thảo này?'))return;
+  novels=novels.filter(n=>n.id!==id);
+  if(currentId===id)currentId=novels[0]?.id||null;
+  if(!currentId)newNovel();
+  saveLocal();remoteDelete(id);render();
+}
+$('#delChat').onclick=()=>{const n=cur();if(n)deleteNovel(n.id)};
+$('#newBtn').onclick=()=>{newNovel();if(isMobile())toggleSide();$('#input').focus()};
+
+/* ---------- Novel modal ---------- */
+const show=id=>$(id).classList.add('show'), hide=id=>$(id).classList.remove('show');
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal-bg').classList.remove('show'));
+$('#novelCard').onclick=()=>{const n=cur();if(!n)return;$('#nvTitle').value=n.title;$('#nvGenre').value=n.genre;$('#nvNotes').value=n.notes||'';show('#novelModal')};
+$('#nvSave').onclick=()=>{const n=cur();n.title=$('#nvTitle').value.trim()||'Truyện mới';n.genre=$('#nvGenre').value.trim()||'Chưa phân loại';n.notes=$('#nvNotes').value;touch(n);persist(n);hide('#novelModal');render()};
+$('#nvExport').onclick=()=>{const n=cur();const b=new Blob([JSON.stringify(n,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n.title.replace(/[^\w\-]+/g,'_')+'.json';a.click()};
+
+/* ---------- Import ---------- */
+$('#impBtn').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;const t=await f.text();e.target.value='';
+  try{
+    if(f.name.endsWith('.json')){
+      const j=JSON.parse(t);(Array.isArray(j)?j:[j]).forEach(x=>{const n={id:uid(),title:x.title||f.name,genre:x.genre||'Đã nhập',notes:x.notes||'',messages:(x.messages||[]).map(m=>({id:uid(),role:m.role==='user'?'user':'model',text:String(m.text||'')})),updatedAt:Date.now()};novels.unshift(n);currentId=n.id;persist(n)});
+    }else{
+      const n={id:uid(),title:f.name.replace(/\.\w+$/,''),genre:'Đã nhập',notes:'',messages:[{id:uid(),role:'model',text:t}],updatedAt:Date.now()};novels.unshift(n);currentId=n.id;persist(n);
+    }
+    render();toast('Đã nhập bản thảo');
+  }catch(err){toast('Không đọc được file: '+err.message)}
+};
+
+/* ---------- Settings modal ---------- */
+function openSettings(){
+  $('#sProvider').value=settings.provider;$('#sBase').value=settings.base;$('#sKey').value=settings.key;$('#sModel').value=settings.model;
+  $('#sTemp').value=settings.temp;$('#tVal').textContent=settings.temp;$('#sSafety').checked=settings.safety;$('#sSys').value=settings.sys;$('#sFb').value=settings.fb;show('#setModal')}
+$('#setBtn').onclick=openSettings;
+$('#sTemp').oninput=e=>$('#tVal').textContent=e.target.value;
+$('#sReset').onclick=()=>$('#sSys').value=DEFAULT_SYS;
+$('#sSave').onclick=()=>{
+  const oldFb=settings.fb;
+  Object.assign(settings,{provider:$('#sProvider').value,base:$('#sBase').value.trim().replace(/\/+$/,''),key:$('#sKey').value.trim(),model:$('#sModel').value.trim(),temp:+$('#sTemp').value,safety:$('#sSafety').checked,sys:$('#sSys').value,fb:$('#sFb').value.trim()});
+  if(settings.fb){try{JSON.parse(settings.fb)}catch{toast('Cấu hình Firebase không phải JSON hợp lệ');return}}
+  saveSettings();hide('#setModal');
+  if(oldFb!==settings.fb)location.reload();else toast('Đã lưu cài đặt');
+};
+
+/* ---------- Generation ---------- */
+function buildSystem(n){return settings.sys+(n.notes?'\n\n[BỐI CẢNH / THIẾT LẬP TRUYỆN]\n'+n.notes:'')}
+async function* sseLines(res,signal){
+  const r=res.body.getReader(),dec=new TextDecoder();let buf='';
+  while(true){const {done,value}=await r.read();if(done)break;buf+=dec.decode(value,{stream:true});
+    const parts=buf.split(/\r?\n/);buf=parts.pop();for(const p of parts)if(p.startsWith('data:')){const d=p.slice(5).trim();if(d&&d!=='[DONE]')yield d}}
+}
+async function generate(n,history,onChunk,signal){
+  if(!settings.key)throw new Error('Chưa nhập API key (Cài đặt).');
+  if(settings.provider==='gemini'){
+    const base=settings.base||'https://generativelanguage.googleapis.com';
+    const contents=history.map(m=>({role:m.role,parts:[{text:m.text}]}));
+    if(contents[0]?.role!=='user')contents.unshift({role:'user',parts:[{text:'Bắt đầu.'}]});
+    const body={systemInstruction:{parts:[{text:buildSystem(n)}]},contents,generationConfig:{temperature:settings.temp}};
+    if(settings.safety)body.safetySettings=['HARM_CATEGORY_HARASSMENT','HARM_CATEGORY_HATE_SPEECH','HARM_CATEGORY_SEXUALLY_EXPLICIT','HARM_CATEGORY_DANGEROUS_CONTENT'].map(c=>({category:c,threshold:'BLOCK_NONE'}));
+    const res=await fetch(`${base}/v1beta/models/${settings.model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(settings.key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+    if(!res.ok)throw new Error('API '+res.status+': '+(await res.text()).slice(0,300));
+    for await(const d of sseLines(res)){const j=JSON.parse(d);const c=j.candidates?.[0];const t=c?.content?.parts?.map(p=>p.text||'').join('')||'';if(t)onChunk(t);
+      if(!t&&c?.finishReason&&c.finishReason!=='STOP'&&c.finishReason!=='MAX_TOKENS')throw new Error('Gemini dừng vì: '+c.finishReason);
+      if(j.promptFeedback?.blockReason)throw new Error('Prompt bị chặn: '+j.promptFeedback.blockReason)}
+  }else{
+    const base=settings.base||'https://api.openai.com/v1';
+    const messages=[{role:'system',content:buildSystem(n)},...history.map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}))];
+    const res=await fetch(base+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+settings.key},body:JSON.stringify({model:settings.model,messages,temperature:settings.temp,stream:true}),signal});
+    if(!res.ok)throw new Error('API '+res.status+': '+(await res.text()).slice(0,300));
+    for await(const d of sseLines(res)){const t=JSON.parse(d).choices?.[0]?.delta?.content;if(t)onChunk(t)}
+  }
+}
+function setBusy(b){busy=b;$('#sendTxt').textContent=b?'Dừng':'Viết Tiếp'}
+async function run(n){
+  const bot={id:uid(),role:'model',text:''};n.messages.push(bot);renderMsgs();
+  const el=$('#msgs').lastElementChild.querySelector('.body');el.classList.add('cursor');
+  setBusy(true);abortCtl=new AbortController();
+  const history=n.messages.slice(0,-1);
+  try{await generate(n,history,t=>{bot.text+=t;el.textContent=bot.text;const M=$('#msgs');if(M.scrollHeight-M.scrollTop-M.clientHeight<160)M.scrollTop=M.scrollHeight},abortCtl.signal)}
+  catch(e){if(e.name!=='AbortError')toast('Lỗi: '+e.message)}
+  setBusy(false);abortCtl=null;
+  if(!bot.text.trim())n.messages.pop();
+  touch(n);persist(n);render();
+}
+async function send(){
+  if(busy){abortCtl?.abort();return}
+  const n=cur()||newNovel();const txt=$('#input').value.trim();
+  const last=n.messages[n.messages.length-1];
+  if(!txt&&last?.role==='user'){await run(n);return}
+  n.messages.push({id:uid(),role:'user',text:txt||'Hãy viết tiếp câu chuyện.'});
+  if(n.title==='Truyện mới'&&txt)n.title=txt.slice(0,40)+(txt.length>40?'…':'');
+  $('#input').value='';touch(n);persist(n);render();await run(n);
+}
+async function regen(){const n=cur();if(!n||busy)return;if(n.messages[n.messages.length-1]?.role==='model')n.messages.pop();await run(n)}
+$('#sendBtn').onclick=send;
+$('#input').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();send()}});
+
+/* ---------- Firebase sync ---------- */
+function setSync(txt,ok){const s=$('#sync');s.classList.toggle('off',!ok);$('#syncTxt').textContent=txt;if(ok){lastSync=new Date();$('#syncTime').textContent='Lần cuối: '+lastSync.toLocaleTimeString('vi-VN',{hour12:false})}else $('#syncTime').textContent=''}
+let saveTimers={};
+function persist(n){saveLocal();if(!fb||!user)return;clearTimeout(saveTimers[n.id]);saveTimers[n.id]=setTimeout(async()=>{
+  try{await fb.setDoc(fb.doc(fb.db,'users',user.uid,'novels',n.id),n);setSync('Đang đồng bộ với thiết bị di động',true)}catch(e){setSync('Lỗi đồng bộ',false);console.error(e)}},600)}
+async function remoteDelete(id){if(!fb||!user)return;try{await fb.deleteDoc(fb.doc(fb.db,'users',user.uid,'novels',id))}catch(e){console.error(e)}}
+let unsub=null;
+function startListen(){
+  if(unsub)unsub();let first=true;
+  unsub=fb.onSnapshot(fb.collection(fb.db,'users',user.uid,'novels'),snap=>{
+    let changed=false;
+    snap.docChanges().forEach(ch=>{const d=ch.doc.data();
+      if(ch.type==='removed'){const had=novels.length;novels=novels.filter(n=>n.id!==d.id);if(novels.length!==had)changed=true}
+      else if(!ch.doc.metadata.hasPendingWrites){const l=novels.find(n=>n.id===d.id);
+        if(!l){novels.push(d);changed=true}else if((d.updatedAt||0)>(l.updatedAt||0)){Object.assign(l,d);changed=true}}});
+    if(first){first=false;const remoteIds=new Set(snap.docs.map(x=>x.id));
+      novels.filter(n=>!remoteIds.has(n.id)&&n.messages.length).forEach(persist)}
+    if(changed){if(!novels.length)newNovel();if(!cur())currentId=novels[0].id;saveLocal();if(!busy)render()}
+    setSync('Đang đồng bộ với thiết bị di động',true);
+  },err=>{setSync('Lỗi đồng bộ',false);toast('Firestore: '+err.message)});
+}
+async function initFirebase(){
+  if(!settings.fb){setSync('Chế độ cục bộ (chưa cấu hình Firebase)',false);return}
+  try{
+    const V='10.14.1',B=`https://www.gstatic.com/firebasejs/${V}/`;
+    const [app,auth,fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+    const a=app.initializeApp(JSON.parse(settings.fb));
+    fb={auth:auth.getAuth(a),db:fs.getFirestore(a),...auth,...fs};
+    fb.provider=new auth.GoogleAuthProvider();
+    auth.onAuthStateChanged(fb.auth,u=>{user=u;
+      $('#userTxt').textContent=u?(u.email||u.displayName):'Đăng nhập Google';
+      if(u)startListen();else{if(unsub)unsub();setSync('Chế độ cục bộ (chưa đăng nhập)',false)}});
+  }catch(e){setSync('Lỗi Firebase',false);toast('Firebase: '+e.message)}
+}
+$('#userBtn').onclick=async()=>{
+  if(!fb){toast('Dán cấu hình Firebase trong Cài đặt trước');openSettings();return}
+  if(user){if(confirm('Đăng xuất '+user.email+'?'))await fb.signOut(fb.auth);return}
+  try{await fb.signInWithPopup(fb.auth,fb.provider)}catch(e){
+    if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code))await fb.signInWithRedirect(fb.auth,fb.provider);
+    else if(e.code!=='auth/popup-closed-by-user')toast('Đăng nhập lỗi: '+e.message)}
+};
+$('#syncBtn').onclick=()=>{if(!user){toast('Hãy đăng nhập trước');return}novels.forEach(persist);toast('Đang đồng bộ lại...')};
+
+/* ---------- Init ---------- */
+if(!novels.length)newNovel();else if(!cur())currentId=novels[0].id;
+if(isMobile())$('#side').classList.remove('open');
+render();initFirebase();
+</script>
+</body>
+</html>
