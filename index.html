@@ -70,6 +70,8 @@ section.chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .msg.model{background:var(--bot)}
 .msg .who{font:700 11px ui-monospace,monospace;letter-spacing:.06em;color:var(--accent);margin-bottom:6px;text-transform:uppercase}
 .msg .body{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.msg .body em{font-style:italic;color:var(--accent)}
+.msg .body .h{font-weight:700;color:var(--accent)}
 .msg .act{display:flex;gap:4px;justify-content:flex-end;margin-top:6px}
 .msg .act button{background:none;border:0;color:var(--muted);padding:6px;border-radius:8px;display:flex}
 .msg .act button:hover{color:var(--accent);background:var(--accent-bg)}
@@ -248,7 +250,7 @@ function renderMsgs(scroll=true){
     const d=document.createElement('div');d.className='msg '+m.role;d.dataset.id=m.id;
     d.innerHTML='<div class="who"></div><div class="body"></div><div class="act"></div>';
     d.querySelector('.who').textContent=m.role==='user'?'Bạn':'Truyện';
-    d.querySelector('.body').textContent=m.text;
+    d.querySelector('.body').innerHTML=md(m.text);
     const a=d.querySelector('.act');
     if(m.role==='model'&&i===n.messages.length-1&&!busy){const r=mk('Viết lại',ICON.redo,()=>regen());a.appendChild(r)}
     a.appendChild(mk('Sao chép',ICON.copy,()=>copyText(m.text)));
@@ -256,6 +258,14 @@ function renderMsgs(scroll=true){
     M.appendChild(d);
   });
   if(scroll)M.scrollTop=M.scrollHeight;
+}
+function md(t){
+  let s=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/^#{1,6}\s*(.+)$/gm,'<span class="h">$1</span>');
+  s=s.replace(/^\s*[*\-]\s+/gm,'• ');
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,'<em>$1</em>');
+  s=s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  return s;
 }
 function mk(title,svg,fn){const b=document.createElement('button');b.title=title;b.innerHTML=svg;b.onclick=fn;return b}
 async function copyText(t){try{await navigator.clipboard.writeText(t)}catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Đã sao chép')}
@@ -306,7 +316,8 @@ $('#sSave').onclick=()=>{
 };
 
 /* ---------- Generation ---------- */
-function buildSystem(n){return settings.sys+(n.notes?'\n\n[BỐI CẢNH / THIẾT LẬP TRUYỆN]\n'+n.notes:'')}
+const FORMAT_RULE='\n\n[ĐỊNH DẠNG BẮT BUỘC]\nViết văn xuôi thuần, như trang tiểu thuyết. Không dùng tiêu đề (#), không dùng gạch đầu dòng, không dùng in đậm (**). Chỉ được dùng dấu * đơn để in nghiêng suy nghĩ hoặc nhấn mạnh khi thật cần.';
+function buildSystem(n){return settings.sys+FORMAT_RULE+(n.notes?'\n\n[BỐI CẢNH / THIẾT LẬP TRUYỆN]\n'+n.notes:'')}
 async function* sseLines(res,signal){
   const r=res.body.getReader(),dec=new TextDecoder();let buf='';
   while(true){const {done,value}=await r.read();if(done)break;buf+=dec.decode(value,{stream:true});
@@ -339,7 +350,7 @@ async function run(n){
   const el=$('#msgs').lastElementChild.querySelector('.body');el.classList.add('cursor');
   setBusy(true);abortCtl=new AbortController();
   const history=n.messages.slice(0,-1);
-  try{await generate(n,history,t=>{bot.text+=t;el.textContent=bot.text;const M=$('#msgs');if(M.scrollHeight-M.scrollTop-M.clientHeight<160)M.scrollTop=M.scrollHeight},abortCtl.signal)}
+  try{await generate(n,history,t=>{bot.text+=t;el.innerHTML=md(bot.text);const M=$('#msgs');if(M.scrollHeight-M.scrollTop-M.clientHeight<160)M.scrollTop=M.scrollHeight},abortCtl.signal)}
   catch(e){if(e.name!=='AbortError')toast('Lỗi: '+e.message)}
   setBusy(false);abortCtl=null;
   if(!bot.text.trim())n.messages.pop();
